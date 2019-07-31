@@ -1,11 +1,12 @@
 ---
-page_type: sample
+topic: sample
 languages:
-- csharp
+ - nodejs
 products:
-- dotnet
-description: "Add 150 character max description"
-urlFragment: "update-this-to-unique-url-stub"
+ - azure-sdks
+services: Azure-Stack
+platforms: nodejs
+author: sijuman
 ---
 
 # Official Microsoft Sample
