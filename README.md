@@ -1,12 +1,8 @@
 ---
-topic: sample
-languages:
- - nodejs
-products:
- - azure-sdks
-services: Azure-Stack
-platforms: nodejs
-author: sijuman
+Topic: sample
+Languages: Node.js
+Products: azure-sdks
+Services: Azure Stack Hub
 ---
 
 # Official Microsoft Sample
@@ -19,36 +15,120 @@ Guidance on onboarding samples to docs.microsoft.com/samples: https://review.doc
 Taxonomies for products and languages: https://review.docs.microsoft.com/new-hope/information-architecture/metadata/taxonomies?branch=master
 -->
 
-Give a short description for your sample here. What does it do and why is it important?
+A sample code to create a virtual machine in Azure.
 
 ## Contents
 
-Outline the file contents of the repository. It helps users navigate the codebase, build configuration and any related assets.
-
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
-| `src`             | Sample source code.                        |
+| `index.js`        | Sample source code.                        |
 | `.gitignore`      | Define what to ignore at commit time.      |
-| `CHANGELOG.md`    | List of changes to the sample.             |
-| `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
+| `package.json`    | Define dependencies.                       |
 | `README.md`       | This README file.                          |
 | `LICENSE`         | The license for the sample.                |
 
 ## Prerequisites
 
-Outline the required components and tools that a user might need to have on their machine in order to run the sample. This can be anything from frameworks, SDKs, OS versions or IDE releases.
+Refer to this azure stack doc for prerequisites link: https://docs.microsoft.com/en-us/azure-stack/user/azure-stack-version-profile-nodejs.
 
+### Certificate
+
+The first option is to use custom local certificate for NodeJS on Windows 10:
+
+1. Get your AzureStack certificate object using the name of the certificate (Powershell Core script).
+    ```powershells
+    $mycert = Get-ChildItem Cert:\CurrentUser\Root | Where-Object Subject -eq "CN=MyAzureCertName"
+    ```
+1. Export the certificate as a .cer file.
+    ```powershells
+    Export-Certificate -Type CERT -FilePath mycert.cer -Cert $mycert
+    ```
+1. Convert .cer file to .pem file (you can use openssl tool that is installed with Git bash and is located in `C:\Program Files\Git\usr\bin`).
+    ```powershells
+    openssl x509 -inform der -in mycert.cer -out mypem.pem
+    ```
+1. Set `NODE_EXTRA_CA_CERTS` environment variable.
+    ```powershells
+    NODE_EXTRA_CA_CERTS=<PATH TO mypem.pem file>
+    ```
+
+The second option is to disable TLS validation without setting `NODE_EXTRA_CA_CERTS` to the local NodeJS .pem file.
+```javascript
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+```
+
+### Virtual Machine
+
+The sample currently looks to create the following VM. Make sure it is available or the sample will fail.
+
+| Type              | Value                                                 |
+|-----------------------|-------------------------------------------------------------|
+| PublisherName       | canonical                            |
+| Offer       | UbuntuServer                        |
+| Sku           | 16.04-LTS                                   |
+
+Alternatively, simply go into the `index.js` and change the values to match a virtual machine that you have available in your Azure Stack environment.
+
+```javascript
+// Ubuntu config
+var publisher = 'Canonical';
+var offer = 'UbuntuServer';
+var sku = '16.04-LTS';
+```
+
+To find available virtual machines, search for `Marketplace management` in the Azure Stack portal. If no virtual machines are available, click on `Add from Azure` to download a new one.
+
+For example, if you have `Windows Server 2016 Datacenter-Pay as you go` marketplace item, you can set those variables to the following to create a Windows 2016-Datacenter virtual machine:
+
+```javascript
+// Windows config
+var publisher = 'MicrosoftWindowsServer';
+var offer = 'WindowsServer';
+var sku = '2016-Datacenter';
+```
 ## Setup
 
-Explain how to prepare the sample once the user clones or downloads the repository. The section should outline every step necessary to install dependencies and set up any settings (for example, API keys and output folders).
+Set following environment variables:
+| Variable              | Description                                                 |
+|-----------------------|-------------------------------------------------------------|
+| `AZURE_SP_APP_ID`       | Service principal application id                            |
+| `AZURE_SP_APP_SECRET`       | Service principal application secret                        |
+| `AZURE_TENANT_ID`           | Azure Stack Hub tenant ID                                   |
+| `AZURE_SUBSCRIPTION_ID`     | Subscription id used to access offers in Azure Stack Hub    |
+| `AZURE_ARM_ENDPOINT`        | Azure Stack Hub Resource Manager Endpoint                   |
+| `AZURE_LOCATION`            | Resource location                                           |
 
-## Runnning the sample
+Service principal example:
 
-Outline step-by-step instructions to execute the sample and see its output. Include steps for executing the sample from the IDE, starting specific services in the Azure portal or anything related to the overall launch of the code.
+AAD
+```
+Secret                : System.Security.SecureString                                 # AZURE_SP_APP_SECRET
+ServicePrincipalNames : {bd6bb75f-5fd6-4db9-91b7-4a6941e7feb9, http://azs-sptest01}
+ApplicationId         : bd6bb75f-5fd6-4db9-91b7-4a6941e7feb9                         # AZURE_SP_APP_ID
+DisplayName           : azs-sptest01
+Id                    : 36a22ee4-e2b0-411d-8f21-0ea8b4b5c46f                         # AZURE_SP_APP_OBJECT_ID
+AdfsId                : 
+Type                  : ServicePrincipal
+```
 
-## Key concepts
+ADFS
+```
+ApplicationIdentifier : S-1-5-21-2937821301-3551617933-4294865508-76632              # AZURE_SP_APP_OBJECT_ID
+ClientId              : 7591924e-0341-4812-8d23-52ef0aa27eff                         # AZURE_SP_APP_ID                   
+Thumbprint            : 
+ApplicationName       : Azurestack-azs-sptest01
+ClientSecret          : <Redacted>                                                   # AZURE_SP_APP_SECRET
+PSComputerName        : <Redacted>
+RunspaceId            : e841cbbc-3d8e-45fd-b63f-42adbfbf664b
+```
 
-Provide users with more context on the tools and services used in the sample. Explain some of the code that is being used and how services interact with each other.
+## Running the sample
+
+From root folder
+```
+npm install
+node .\index.js
+```
 
 ## Contributing
 
