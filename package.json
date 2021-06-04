@@ -2,8 +2,9 @@
   "name": "storage-node-resource-provider-getting-started",
   "author": "Microsoft Corporation",
   "contributors": [
-    "Zavery, Amar <amzavery@microsoft.com>",
-    "Hao Chen <hach@microsoft.com"
+    "Amar Zavery <amzavery@microsoft.com>",
+    "Hao Chen <hach@microsoft.com>",
+    "Wei Shi"
   ],
   "version": "0.1.0",
   "description": "A sample to demonstrate managing storage accounts in Azure using node sdk.",
@@ -18,22 +19,13 @@
   "main": "./index.js",
   "license": "MIT",
   "dependencies": {
-    "@azure/arm-authorization-profile-2019-03-01-hybrid": "^1.0.0",
-    "@azure/arm-compute-profile-2019-03-01-hybrid": "^1.0.0",
-    "@azure/arm-network-profile-2019-03-01-hybrid": "^1.0.0",
-    "@azure/arm-resources-profile-hybrid-2019-03-01": "^1.0.0",
-    "@azure/arm-storage-profile-2019-03-01-hybrid": "^1.0.0",
+    "@azure/arm-compute-profile-2020-09-01-hybrid": "^1.0.0",
+    "@azure/arm-network-profile-2020-09-01-hybrid": "^1.0.0",
+    "@azure/arm-resources-profile-2020-09-01-hybrid": "^1.0.0",
+    "@azure/arm-storage-profile-2020-09-01-hybrid": "^1.0.0",
     "@azure/ms-rest-azure-env": "^2.0.0",
-    "@azure/ms-rest-js": "^2.0.3",
     "@azure/ms-rest-nodeauth": "^2.0.2",
-    "async": "0.2.7",
-    "azure-arm-compute": "^0.18.1",
-    "azure-arm-network": "^0.13.2",
-    "azure-arm-resource": "^1.4.4-preview",
-    "azure-arm-storage": "^0.13.1-preview",
-    "ms-rest-azure": "^1.14.3",
-    "node-fetch": "^2.6.0",
-    "system-sleep": "^1.3.6"
+    "async": "0.2.7"
   },
   "homepage": "https://github.com/Azure-Samples/storage-node-resource-provider-getting-started",
   "repository": {
@@ -42,5 +34,10 @@
   },
   "bugs": {
     "url": "https://github.com/azure/azures-sdk-for-node/issues"
+  },
+  "devDependencies": {
+    "eslint": "^7.29.0",
+    "install": "^0.13.0",
+    "npm": "^7.19.0"
   }
 }
