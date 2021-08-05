@@ -127,7 +127,7 @@ RunspaceId            : e841cbbc-3d8e-45fd-b63f-42adbfbf664b
 From root folder
 ```
 npm install
-node .\index.js
+node .\index.js <VM Username> <VM Password>
 ```
 
 ## Contributing

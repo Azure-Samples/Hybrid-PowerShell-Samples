@@ -4,15 +4,15 @@
  * license information.
  */
 "use strict";
-var Environment = require("@azure/ms-rest-azure-env");
-var util = require("util");
-var async = require("async");
-var msRestAzure = require("@azure/ms-rest-nodeauth");
-var ComputeManagementClient = require("@azure/arm-compute-profile-2020-09-01-hybrid").ComputeManagementClient;
-var StorageManagementClient = require("@azure/arm-storage-profile-2020-09-01-hybrid").StorageManagementClient;
-var NetworkManagementClient = require("@azure/arm-network-profile-2020-09-01-hybrid").NetworkManagementClient;
-var ResourceManagementClient = require("@azure/arm-resources-profile-2020-09-01-hybrid").ResourceManagementClient;
-const request = require("request");
+const Environment = require("@azure/ms-rest-azure-env");
+const util = require("util");
+const async = require("async");
+const msRestAzure = require("@azure/ms-rest-nodeauth");
+const ComputeManagementClient = require("@azure/arm-compute-profile-2020-09-01-hybrid").ComputeManagementClient;
+const StorageManagementClient = require("@azure/arm-storage-profile-2020-09-01-hybrid").StorageManagementClient;
+const NetworkManagementClient = require("@azure/arm-network-profile-2020-09-01-hybrid").NetworkManagementClient;
+const ResourceManagementClient = require("@azure/arm-resources-profile-2020-09-01-hybrid").ResourceManagementClient;
+const axios = require("axios");
 
 const clientIdEnvName = "AZURE_SP_APP_ID";
 const secretEnvName  = "AZURE_SP_APP_SECRET";
@@ -56,37 +56,25 @@ var sku = "16.04-LTS";
 
 var adminUsername = process.argv[2];
 var adminPassword = process.argv[3];
-
-// create a map
 var map = {};
+
+if (armEndpoint.slice(-1) != "/") {
+  armEndpoint = armEndpoint + "/";
+}
 const fetchUrl = armEndpoint + "metadata/endpoints?api-version=2019-10-01";
 
-function initialize() {
-  // Setting URL and headers for request
-  var options = {
-    url: fetchUrl,
-    headers: {
-      "User-Agent": "request"
-    },
-    rejectUnauthorized: false
-  };
-  // Return new promise 
-  return new Promise(function (resolve, reject) {
-    // Do async job
-    request.get(options, function (err, resp, body) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(JSON.parse(body));
-      }
-    });
-  });
-
+async function fetchEndpointMetadata() {
+  try {
+      const response = await axios.get(fetchUrl);
+      return response.data;
+  } catch (error) {
+      console.error(error);
+  }
 }
 
 function main() {
-  var initializePromise = initialize();
-  initializePromise.then(function (result) {
+  var endpointData = fetchEndpointMetadata();
+  endpointData.then(function (result) {
     var metadata = result[0];
     console.log("Initialized user details");
     console.log(metadata);
@@ -221,7 +209,7 @@ function main() {
             } else {
               console.log(util.format("\n######All the operations have completed successfully. " +
                 "The final set of results are as follows:\n%s", util.inspect(results, { depth: null })));
-              console.log(util.format("\n\n-->Please execute the following script for cleanup:\nnode cleanup.js %s %s", resourceGroupName, vmName));
+              console.log(util.format("\n\n-->Please execute the following script for cleanup:\nnode cleanup.js"));
             }
           console.log("\n###### Exit ######");
           process.exit();
