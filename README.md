@@ -1,11 +1,14 @@
 ---
-Topic: sample
-Languages: Node.js
-Products: azure-sdks
-Services: Azure Stack Hub
+page_type: sample
+languages: 
+- powershell
+products: 
+- azure-sdks
+description: "These samples demonstrate various interaction with Azure Stack Hub."
+urlFragment: Hybrid-Golang-Samples
 ---
 
-# Official Microsoft Sample
+# Hybrid PowerShell Samples
 
 <!-- 
 Guidelines on README format: https://review.docs.microsoft.com/help/onboard/admin/samples/concepts/readme-template?branch=master
@@ -15,119 +18,67 @@ Guidance on onboarding samples to docs.microsoft.com/samples: https://review.doc
 Taxonomies for products and languages: https://review.docs.microsoft.com/new-hope/information-architecture/metadata/taxonomies?branch=master
 -->
 
-A sample code to create a virtual machine in Azure.
+This repository is for Azure Stack Hub JavaScript samples. Each of the sub-directories contain README.md files detailing how to that sample.
 
-## Contents
+If you don't already have it, [install PowerShell Core](https://github.com/PowerShell/powershell/releases).
 
-| File/folder       | Description                                |
-|-------------------|--------------------------------------------|
-| `index.js`        | Sample source code.                        |
-| `.gitignore`      | Define what to ignore at commit time.      |
-| `package.json`    | Define dependencies.                       |
-| `README.md`       | This README file.                          |
-| `LICENSE`         | The license for the sample.                |
+## Create Service Principal
+Create a [service principal](https://docs.microsoft.com/en-us/azure/azure-stack/azure-stack-create-service-principals) to work against AzureStack. Make sure your service principal has [contributor/owner role](https://docs.microsoft.com/en-us/azure/azure-stack/azure-stack-create-service-principals#assign-role-to-service-principal) on your subscription. The samples use either a secret or certificate service principal.
 
-## Prerequisites
+## Configure Service Principal Details
+Some of the configuration parameters from service principal objects may not be used in the samples. The configuration file includes them anyway for thoroughness and future-proofing.
 
-Refer to this azure stack doc for prerequisites link: https://docs.microsoft.com/en-us/azure-stack/user/azure-stack-version-profile-nodejs.
+### Setup Secret Service Principal
 
-### Certificate
+Set the following JSON properties in `./azureAppSpConfig.json`.
 
-The first option is to use custom local certificate for NodeJS on Windows 10:
-
-1. Get your AzureStack certificate object using the name of the certificate (Powershell Core script).
-    ```powershells
-    $mycert = Get-ChildItem Cert:\CurrentUser\Root | Where-Object Subject -eq "CN=MyAzureCertName"
-    ```
-1. Export the certificate as a .cer file.
-    ```powershells
-    Export-Certificate -Type CERT -FilePath mycert.cer -Cert $mycert
-    ```
-1. Convert .cer file to .pem file (you can use openssl tool that is installed with Git bash and is located in `C:\Program Files\Git\usr\bin`).
-    ```powershells
-    openssl x509 -inform der -in mycert.cer -out mypem.pem
-    ```
-1. Set `NODE_EXTRA_CA_CERTS` environment variable.
-    ```powershells
-    NODE_EXTRA_CA_CERTS=<PATH TO mypem.pem file>
-    ```
-
-The second option is to disable TLS validation without setting `NODE_EXTRA_CA_CERTS` to the local NodeJS .pem file.
-```javascript
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-```
-
-### Virtual Machine
-
-The sample currently looks to create the following VM. Make sure it is available or the sample will fail.
-
-| Type              | Value                                                 |
-|-----------------------|-------------------------------------------------------------|
-| PublisherName       | canonical                            |
-| Offer       | UbuntuServer                        |
-| Sku           | 16.04-LTS                                   |
-
-Alternatively, simply go into the `index.js` and change the values to match a virtual machine that you have available in your Azure Stack environment.
-
-```javascript
-// Ubuntu config
-var publisher = 'Canonical';
-var offer = 'UbuntuServer';
-var sku = '16.04-LTS';
-```
-
-To find available virtual machines, search for `Marketplace management` in the Azure Stack portal. If no virtual machines are available, click on `Add from Azure` to download a new one.
-
-For example, if you have `Windows Server 2016 Datacenter-Pay as you go` marketplace item, you can set those variables to the following to create a Windows 2016-Datacenter virtual machine:
-
-```javascript
-// Windows config
-var publisher = 'MicrosoftWindowsServer';
-var offer = 'WindowsServer';
-var sku = '2016-Datacenter';
-```
-## Setup
-
-Set following environment variables:
 | Variable              | Description                                                 |
 |-----------------------|-------------------------------------------------------------|
-| `AZURE_SP_APP_ID`       | Service principal application id                            |
-| `AZURE_SP_APP_SECRET`       | Service principal application secret                        |
-| `AZURE_TENANT_ID`           | Azure Stack Hub tenant ID                                   |
-| `AZURE_SUBSCRIPTION_ID`     | Subscription id used to access offers in Azure Stack Hub    |
-| `AZURE_ARM_ENDPOINT`        | Azure Stack Hub Resource Manager Endpoint                   |
-| `AZURE_LOCATION`            | Resource location                                           |
+| `clientId`            | Service principal application id.                            |
+| `clientSecret`        | Service principal application secret.                        |
+| `clientObjectId`      | Service principal object id.                                 |
+| `tenantId`            | Azure Stack Hub tenant id.                                   |
+| `subscriptionId`      | Subscription id used to access offers in Azure Stack Hub.    |
+| `resourceManagerUrl`  | Azure Stack Hub Resource Manager Endpoint.                   |
+| `location`            | Azure Resource location.                                     |
 
-Service principal example:
+### Setup Certificate Service Principal 
+
+The certificate service principal will be similar in output to secret service principal, except it uses `azureCertSpConfig.json` config file.
+
+| Variable              | Description                                                 |
+|-----------------------|-------------------------------------------------------------|
+| `clientId`            | Service principal application id.                            |
+| `certPass`            | Certificate password                                        |
+| `certPath`            | "/" separated path to the certificate.                      |
+| `clientObjectId`      | Service principal object id.                                 |
+| `tenantId`            | Azure Stack Hub tenant id.                                   |
+| `subscriptionId`      | Subscription id used to access offers in Azure Stack Hub.    |
+| `resourceManagerUrl`  | Azure Stack Hub Resource Manager Endpoint.                   |
+| `location`            | Azure Resource location.                                     |
+
+Service principal PowerShell object output example for secret service principal:
 
 AAD
 ```
-Secret                : System.Security.SecureString                                 # AZURE_SP_APP_SECRET
+Secret                : System.Security.SecureString                                 # clientSecret  (decrypt for external use)
 ServicePrincipalNames : {bd6bb75f-5fd6-4db9-91b7-4a6941e7feb9, http://azs-sptest01}
-ApplicationId         : bd6bb75f-5fd6-4db9-91b7-4a6941e7feb9                         # AZURE_SP_APP_ID
+ApplicationId         : bd6bb75f-5fd6-4db9-91b7-4a6941e7feb9                         # clientId
 DisplayName           : azs-sptest01
-Id                    : 36a22ee4-e2b0-411d-8f21-0ea8b4b5c46f                         # AZURE_SP_APP_OBJECT_ID
+Id                    : 36a22ee4-e2b0-411d-8f21-0ea8b4b5c46f                         # clientObjectId
 AdfsId                : 
 Type                  : ServicePrincipal
 ```
 
 ADFS
 ```
-ApplicationIdentifier : S-1-5-21-2937821301-3551617933-4294865508-76632              # AZURE_SP_APP_OBJECT_ID
-ClientId              : 7591924e-0341-4812-8d23-52ef0aa27eff                         # AZURE_SP_APP_ID                   
+ApplicationIdentifier : S-1-5-21-2937821301-3551617933-4294865508-76632              # clientObjectId
+ClientId              : 7591924e-0341-4812-8d23-52ef0aa27eff                         # clientId
 Thumbprint            : 
 ApplicationName       : Azurestack-azs-sptest01
-ClientSecret          : <Redacted>                                                   # AZURE_SP_APP_SECRET
+ClientSecret          : <Redacted>                                                   # clientSecret
 PSComputerName        : <Redacted>
 RunspaceId            : e841cbbc-3d8e-45fd-b63f-42adbfbf664b
-```
-
-## Running the sample
-
-From root folder
-```
-npm install
-node .\index.js <VM Username> <VM Password>
 ```
 
 ## Contributing
