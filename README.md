@@ -5,7 +5,7 @@ languages:
 products: 
 - azure-sdks
 description: "These samples demonstrate various interaction with Azure Stack Hub."
-urlFragment: Hybrid-Golang-Samples
+urlFragment: Hybrid-PowerShell-Samples
 ---
 
 # Hybrid PowerShell Samples
